@@ -83,13 +83,14 @@ syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 syn cluster hsTypeSyntax contains=hsTypeVar,hsReservedOp,hsTypeCons
 
 syn keyword hsTypeDecls default
-syn region hsTypeDecl start="\%(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend
+syn region hsTypeDecl start="\%(class\|instance\|data\|newtype\|type\)" end="\ze\%(where\|=\|::\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend
 syn match hsTypeVar "\<[a-z]\([a-zA-Z0-9]\|'\)*" contained
 syn match hsTypeCons "\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*" contained
+syn match hsTypeDecls "deriving\s\+" nextgroup=hsTypeCons,_hsListTypeCons
+syn region _hsListTypeCons start="(" end=")" matchgroup=hsDelimiter contains=hsTypeCons
 " Declare the remaining hsTypeDecls as contained because keywords have higher
 " matching priority than regions
-syn region hsDeriving start="deriving\s\+(" end=")" contains=hsTypeDecls,hsTypeCons
-syn keyword hsTypeDecls class instance data newtype type deriving contained
+syn keyword hsTypeDecls class instance data newtype type contained
 
 " FIXME: Maybe we can do something fancy for data/type families?  'family' is
 " only a keyword if it follows data/type...
