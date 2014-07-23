@@ -79,9 +79,13 @@ syn keyword hsImport import module
 " Treat 'qualified', 'as', and 'hiding' as keywords when following 'import'
 syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 
+syn cluster hsTypeSyntax contains=hsTypeDecls,hsTypeVar,hsKeyword,hsReservedOp,hsTypeName,hsDelimiter
+
 syn keyword hsTypeDecls deriving default
 
-syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=hsTypeDecls,hsTypeVar,hsKeyword,hsReservedOp,hsTypeName,hsDelimiter transparent keepend
+" Declare the remaining hsTypeDecls as contained because keywords have higher
+" matching priority than regions
+syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=@hsTypeSyntax transparent keepend
 syn match hsTypeVar "\<[a-z]\([a-z0-9]\|'\)*" contained
 syn keyword hsTypeDecls class instance data newtype type contained
 
@@ -107,6 +111,8 @@ syn match hsFunction "\s*[a-z][a-zA-Z0-9']*\([[:space:]\n]*\(::\|,\)\)\@=" conta
 " Also support the style where the first where binding is on the same line as
 " the where keyword.
 syn match hsFunction "\(\<\(where\|let\)\s\+\([a-z][a-zA-Z0-9']*\s*,\s*\)*\)\@<=[a-z][a-zA-Z0-9']*\(\s*\(,\s*[a-z][a-zA-Z0-9']*\s*\)*::\)\@="
+
+syn region hsTypeAnno start="::" end="\(,\|)\|}\)" contains=@hsTypeSyntax keepend
 
 " FIXME Ignoring proc for now, also mdo and rec
 
