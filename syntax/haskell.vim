@@ -99,8 +99,8 @@ syn keyword hsTypeDecls class instance data newtype type contained
 syn match hsOperator "\(\%^\#\!\)\@!\(\(\<[A-Z]\w*\)\@64<=\.\)\@!\(--\+\([^.%\~\&\*/\$\^|@:+<!>=#!\?]\|$\)\)\@![-.%\~\&\*/\$\^|@:+<!>=#!\?]\+"
 " Include support for infix functions as operators
 syn match hsOperator "`[a-zA-Z0-9\.]\+`"
-" '=' and '::' operators
-syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\|=>\)"
+" Operators that are language-defined -- '=', '::', '=>' etc
+syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\|=>\|->\|<-\)"
 
 " Highlight function/value names in type signatures.  Looks ahead to find a ::
 " after a name.  This allows whitespace before the name so that it can match
@@ -137,8 +137,6 @@ syntax match hsOperator
     \ display conceal cchar=∘
 
 setlocal conceallevel=2
-
-highlight default link Conceal Operator
 
 if version >= 508 || !exists('did_hs_syntax_inits')
   if version < 508
@@ -188,6 +186,8 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsDelimiter Delimiter
 
   HiLink hsScary Todo
+
+  HiLink Conceal Operator
 
   delcommand HiLink
 endif
