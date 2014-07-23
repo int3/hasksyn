@@ -12,6 +12,7 @@ endif
 
 syn sync minlines=50 maxlines=200
 
+" Right at the start, so they get overwritten ('specialized') easily
 syn match  hsDelimiter        "\((\|)\|{\|}\|\[\|\]\|,\)"
 
 " These basic lexical definitions are taken from the orignal haskell syntax
@@ -38,7 +39,9 @@ syn match hsTypeName "\[\]"
 syn keyword hsFIXME contained FIXME TODO XXX BUG NOTE
 
 " Comment stuff
+" The most general type of comment first.
 syn region hsBlockComment start='{-' end='-}' fold contains=hsFIXME,hsBlockComment,@Spell
+" Specialize.
 syn region hsPragma start='{-#' end='#-}'
 " FIXME: haddock block comments should be able to contain hsBlockComments, but
 " it doesn't seem to work at the moment.
@@ -113,6 +116,7 @@ syn match hsCPPInclude '\(^\s*\)\@<=#include\W\@='
 syn match hsCPPDefine '\(^\s*\)\@<=#define\W\@='
 syn match hsCPPDefined '\(^\s*.*\W\)\@<=defined(\w\+)'
 
+" Copied from vim2hs. Cute conceals.
 syntax match hsStructure
     \ "\\\ze[[:alpha:][:space:]_([]"
     \ display conceal cchar=λ
