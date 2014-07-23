@@ -181,7 +181,6 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsTypeCons StorageClass
   HiLink hsDataConDecl hsDataCons
   HiLink hsPipeDataConDecl hsReservedOp
-  HiLink _hsListTypeCons hsDelimiter
 
   HiLink hsFIXME Todo
 

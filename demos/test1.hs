@@ -1,9 +1,10 @@
+{-# OPTIONS_GHC -w #-}
 {-# LANGUAGE CPP, ExistentialQuantification, KindSignatures, TypeFamilies,
     RecursiveDo #-}
 module Test1 (
   -- * Types
   Type1,
-  TF(..),
+  Foo(..),
   -- * Functions
   func
   ) where
@@ -28,7 +29,8 @@ data Type1 a = TC1 a Int
 -- paren-less deriving
 newtype Foo = Foo Int deriving Eq
 
-#if defined(__GLASGOW_HASKELL__)
+#define FOO
+#if defined(FOO)
 class TF a where
   data Bar :: * -> *
   data Baz :: *
@@ -36,24 +38,8 @@ class TF a where
   tf :: a -> Int -> Baz
 #endif
 
-
-func :: (Ord a, Eq a)
-     => Int
-     -> a
-     -> IO (Type1 a)
-func i a = do
-  l <- getLine
-  case l of
-    'x' : _ -> return TC3
-    _ -> do
-      putStrLn "No 'x', but have a string pretending to let bindings"
-      let foo = 100
-          bar = 10 {- behave around ugly comments
-          FIXME: With fixme highlighting
-      return
-      -}
-
-      return$ TC1 a i
+func :: forall a. (Ord a, Eq a) => Int -> a -> IO (Type1 a)
+func i a = undefined
 
 foo :: Int -> IO ()
 foo = mdo
