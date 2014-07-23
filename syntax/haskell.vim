@@ -63,7 +63,7 @@ syn match hsLineComment "\%^\#\!.*$"
 " Keywords appearing in expressions, plus a few top-level keywords
 syn keyword hsKeyword do mdo let in where
 syn keyword hsKeyword infix infixl infixr
-syn keyword hsKeyword forall foreign
+syn keyword hsKeyword foreign
 syn match hsKeyword '\(^\(data\|type\)\s\+\)\@<=family\(\W\)\@='
 
 " Vim has a special syntax category for conditionals, so here are all of the
@@ -83,7 +83,7 @@ syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 syn cluster hsTypeSyntax contains=hsTypeVar,hsReservedOp,hsTypeCons
 
 syn keyword hsTypeDecls default
-syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend
+syn region hsTypeDecl start="\%(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend
 syn match hsTypeVar "\<[a-z]\([a-zA-Z0-9]\|'\)*" contained
 syn match hsTypeCons "\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*" contained
 " Declare the remaining hsTypeDecls as contained because keywords have higher
@@ -102,7 +102,7 @@ syn match hsOperator "\(\%^\#\!\)\@!\(\(\<[A-Z]\w*\)\@64<=\.\)\@!\(--\+\([^.%\~\
 " Include support for infix functions as operators
 syn match hsOperator "`[a-zA-Z0-9\.]\+`"
 " Operators that are language-defined -- '=', '::', '=>' etc
-syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\|=>\|->\|<-\)"
+syn match hsReservedOp "\%(=\(\s\|\w\|$\)\|::\|=>\|->\|<-\)"
 
 " Highlight function/value names in type signatures.  Looks ahead to find a ::
 " after a name.  This allows whitespace before the name so that it can match
@@ -115,7 +115,8 @@ syn match hsFunction "\s*[a-z][a-zA-Z0-9']*\([[:space:]\n]*\(::\|,\)\)\@=" conta
 syn match hsFunction "\(\<\(where\|let\)\s\+\([a-z][a-zA-Z0-9']*\s*,\s*\)*\)\@<=[a-z][a-zA-Z0-9']*\(\s*\(,\s*[a-z][a-zA-Z0-9']*\s*\)*::\)\@="
 
 syn region _hsParenTypeSyntax start="(" end=")" matchgroup=hsDelimiter contains=_hsParenTypeSyntax,@hsTypeSyntax contained
-syn region hsTypeAnno start="::" end="\(,\|}\|)\|$\)" contains=_hsParenTypeSyntax,@hsTypeSyntax
+syn keyword hsTypeQuant forall contained
+syn region hsTypeAnno start="::" end="\ze\%(,\|}\|)\|$\)" contains=_hsParenTypeSyntax,@hsTypeSyntax,hsTypeQuant
 
 " FIXME Ignoring proc for now, also mdo and rec
 
@@ -164,6 +165,7 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsHaddockSection SpecialComment
 
   HiLink hsKeyword Keyword
+  HiLink hsTypeQuant Keyword
   HiLink hsConditional Conditional
   HiLink hsImport Include
   HiLink hsTypeDecls Keyword
