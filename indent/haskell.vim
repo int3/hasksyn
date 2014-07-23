@@ -50,13 +50,15 @@ function! HIndent(lnum)
   let thisl = s:GetAndStripTrailingComments(a:lnum)
   let previ = indent(plnum)
 
-  " If this is a bare where clause, indent it one step.  where as part of an
-  " instance should be unaffected unless you put it in an odd place.
-  " This is the wrong thing if you are deeply indented already and want to put
-  " a where clause on the top-level construct, but there isn't much that can
-  " be done about that case...
+  " bare 'where' clause: look for the first preceding line that has '=' or '->',
+  " and indent by half width.  currently we rely on surrounding whitespace to
+  " distinguish '=' from '=<<' etc.
   if thisl =~ '^\s*where\s*$'
-    return previ + &sw
+    let blockStart = s:BackwardPatternSearch(a:lnum, '\S.*\s\(=\|->\)\(\s\|$\)')
+    if blockStart != -1
+        return blockStart + (&sw / 2)
+    endif
+    return 0
   endif
 
   " If we start a new line for a type signature, see if we can line it up with
@@ -122,7 +124,12 @@ function! HIndent(lnum)
     return previ + &sw
   endif
 
-  " If the previous line ends in a where, indent us a step
+  " If the previous line ends in a bare where, indent us a half step
+  if prevl =~ '^\s*where\s*$'
+    return previ + (&sw / 2)
+  endif
+
+  " If the previous line ends in a non-bare where, indent us a step
   if prevl =~ '\Wwhere\s*$'
     return previ + &sw
   endif
