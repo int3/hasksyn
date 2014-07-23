@@ -79,7 +79,12 @@ syn keyword hsImport import module
 " Treat 'qualified', 'as', and 'hiding' as keywords when following 'import'
 syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 
-syn keyword hsTypeDecls class instance data newtype type deriving default
+syn keyword hsTypeDecls deriving default
+
+syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=hsTypeDecls,hsTypeVar,hsKeyword,hsReservedOp,hsTypeName,hsDelimiter transparent keepend
+syn match hsTypeVar "\<[a-z]\([a-z0-9]\|'\)*" contained
+syn keyword hsTypeDecls class instance data newtype type contained
+
 " FIXME: Maybe we can do something fancy for data/type families?  'family' is
 " only a keyword if it follows data/type...
 
@@ -91,7 +96,7 @@ syn match hsOperator "\(\%^\#\!\)\@!\(\(\<[A-Z]\w*\)\@64<=\.\)\@!\(--\+\([^.%\~\
 " Include support for infix functions as operators
 syn match hsOperator "`[a-zA-Z0-9\.]\+`"
 " '=' and '::' operators
-syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\)"
+syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\|=>\)"
 
 " Highlight function/value names in type signatures.  Looks ahead to find a ::
 " after a name.  This allows whitespace before the name so that it can match
@@ -155,6 +160,7 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsConditional Conditional
   HiLink hsImport Include
   HiLink hsTypeDecls Keyword
+  HiLink hsTypeVar Identifier
 
   HiLink hsFIXME Todo
 
