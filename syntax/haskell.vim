@@ -81,16 +81,23 @@ syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 
 " For `data [hsTypeSyntax] = ...` and `foo :: [hsTypeSyntax]`
 syn cluster hsTypeSyntax contains=hsTypeVar,hsReservedOp,hsTypeCons
+syn match hsTypeVar "\<[a-z]\([a-zA-Z0-9]\|'\)*" contained " a, a1, a', aA
+syn match hsTypeCons "\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*" contained
 
 syn keyword hsTypeDecls default
-syn region hsTypeDecl start="\%(class\|instance\|data\|newtype\|type\)" end="\ze\%(where\|=\|::\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend
-syn match hsTypeVar "\<[a-z]\([a-zA-Z0-9]\|'\)*" contained
-syn match hsTypeCons "\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*" contained
-syn match hsTypeDecls "deriving\s\+" nextgroup=hsTypeCons,_hsListTypeCons
-syn region _hsListTypeCons start="(" end=")" matchgroup=hsDelimiter contains=hsTypeCons
+syn region hsTypeDecl start="\%(class\|instance\|data\|newtype\|type\)" end="\%(where\|=\|::\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend nextgroup=hsDataConDecl
 " Declare the remaining hsTypeDecls as contained because keywords have higher
 " matching priority than regions
 syn keyword hsTypeDecls class instance data newtype type contained
+syn match hsDataConDecl "\<[A-Z][a-zA-Z0-9]*" contained nextgroup=hsDataConDeclArgs
+" newlines get consumed, pipes don't, so hsPipeDataConDecl can follow
+" the space in 'start' seems necessary, no idea why
+syn region hsDataConDeclArgs start=" " end="\%(\zederiving\|\n\|\ze|\)" contained contains=@hsTypeSyntax,hsDelimiter keepend nextgroup=hsPipeDataConDecl
+syn match hsPipeDataConDecl "\s*|\s*" contained nextgroup=hsDataConDecl
+
+" deriving Eq, deriving (Eq, Ord)
+syn match hsTypeDecls "deriving\s\+" nextgroup=hsTypeCons,_hsListTypeCons
+syn region _hsListTypeCons start="(" end=")" matchgroup=hsDelimiter contains=hsTypeCons contained
 
 " FIXME: Maybe we can do something fancy for data/type families?  'family' is
 " only a keyword if it follows data/type...
@@ -172,6 +179,9 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsTypeDecls Keyword
   HiLink hsTypeVar Identifier
   HiLink hsTypeCons StorageClass
+  HiLink hsDataConDecl hsDataCons
+  HiLink hsPipeDataConDecl hsReservedOp
+  HiLink _hsListTypeCons hsDelimiter
 
   HiLink hsFIXME Todo
 
