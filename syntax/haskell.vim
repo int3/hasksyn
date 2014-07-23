@@ -12,6 +12,8 @@ endif
 
 syn sync minlines=50 maxlines=200
 
+syn match  hsDelimiter        "\((\|)\|{\|}\|\[\|\]\|,\)"
+
 " These basic lexical definitions are taken from the orignal haskell syntax
 " description from vim 7.3.
 syn match  hsSpecialChar      contained "\\\([0-9]\+\|o[0-7]\+\|x[0-9a-fA-F]\+\|[\"\\'&\\abfnrtv]\|^[A-Z^_\[\\\]]\)"
@@ -36,8 +38,8 @@ syn match hsTypeName "\[\]"
 syn keyword hsFIXME contained FIXME TODO XXX BUG NOTE
 
 " Comment stuff
-syn region hsPragma start='{-#' end='#-}'
 syn region hsBlockComment start='{-' end='-}' fold contains=hsFIXME,hsBlockComment,@Spell
+syn region hsPragma start='{-#' end='#-}'
 " FIXME: haddock block comments should be able to contain hsBlockComments, but
 " it doesn't seem to work at the moment.
 syn region hsHaddockComment start='{-|' end='-}' contains=hsFIXME,@Spell
@@ -85,12 +87,14 @@ syn keyword hsTypeDecls class instance data newtype type deriving default
 syn match hsOperator "\(\%^\#\!\)\@!\(\(\<[A-Z]\w*\)\@64<=\.\)\@!\(--\+\([^.%\~\&\*/\$\^|@:+<!>=#!\?]\|$\)\)\@![-.%\~\&\*/\$\^|@:+<!>=#!\?]\+"
 " Include support for infix functions as operators
 syn match hsOperator "`[a-zA-Z0-9\.]\+`"
+" '=' and '::' operators
+syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\)"
 
 " Highlight function/value names in type signatures.  Looks ahead to find a ::
 " after a name.  This allows whitespace before the name so that it can match
 " in a 'where,' but it won't match local type annotations on random little
 " things.
-syn match hsFunctionList "^\s*\(\<\(where\>\|let\>\)\@![a-z][a-zA-Z0-9']*[[:space:]\n,]\+\)*[a-z][a-zA-Z0-9']*[[:space:]\n]*::" contains=hsFunction
+syn match hsFunctionList "^\s*\(\<\(where\>\|let\>\)\@![a-z][a-zA-Z0-9']*[[:space:]\n,]\+\)*[a-z][a-zA-Z0-9']*[[:space:]\n]*::" contains=hsFunction,hsReservedOp
 syn match hsFunction "\s*[a-z][a-zA-Z0-9']*\([[:space:]\n]*\(::\|,\)\)\@=" contained
 " Also support the style where the first where binding is on the same line as
 " the where keyword.
@@ -127,7 +131,7 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   " Comments
   HiLink hsLineComment Comment
   HiLink hsBlockComment Comment
-  HiLink hsPragma Comment
+  HiLink hsPragma SpecialComment
   HiLink hsHaddockComment SpecialComment
   HiLink hsHaddockSection SpecialComment
 
@@ -139,6 +143,7 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsFIXME Todo
 
   HiLink hsOperator Operator
+  HiLink hsReservedOp Structure
 
   HiLink hsModuleQualifier StorageClass
 
@@ -151,6 +156,8 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsNumber Number
   HiLink hsCharacter Character
   HiLink hsString String
+
+  HiLink hsDelimiter Delimiter
 
   HiLink hsScary Todo
 
