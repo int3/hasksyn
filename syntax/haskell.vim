@@ -80,15 +80,16 @@ syn keyword hsImport import module
 syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 
 " For `data [hsTypeSyntax] = ...` and `foo :: [hsTypeSyntax]`
-syn cluster hsTypeSyntax contains=hsTypeDecls,hsTypeVar,hsKeyword,hsReservedOp,hsTypeCons,hsDelimiter
+syn cluster hsTypeSyntax contains=hsTypeVar,hsReservedOp,hsTypeCons
 
-syn keyword hsTypeDecls deriving default
-syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=@hsTypeSyntax transparent keepend
-syn match hsTypeVar "\<[a-z]\([a-z0-9]\|'\)*" contained
+syn keyword hsTypeDecls default
+syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=hsTypeDecls,hsKeyword,@hsTypeSyntax keepend
+syn match hsTypeVar "\<[a-z]\([a-zA-Z0-9]\|'\)*" contained
 syn match hsTypeCons "\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*" contained
 " Declare the remaining hsTypeDecls as contained because keywords have higher
 " matching priority than regions
-syn keyword hsTypeDecls class instance data newtype type contained
+syn region hsDeriving start="deriving\s\+(" end=")" contains=hsTypeDecls,hsTypeCons
+syn keyword hsTypeDecls class instance data newtype type deriving contained
 
 " FIXME: Maybe we can do something fancy for data/type families?  'family' is
 " only a keyword if it follows data/type...
@@ -107,13 +108,14 @@ syn match hsReservedOp "\(=\(\s\|\w\|$\)\|::\|=>\|->\|<-\)"
 " after a name.  This allows whitespace before the name so that it can match
 " in a 'where,' but it won't match local type annotations on random little
 " things.
-syn match hsFunctionList "^\s*\(\<\(where\>\|let\>\)\@![a-z][a-zA-Z0-9']*[[:space:]\n,]\+\)*[a-z][a-zA-Z0-9']*[[:space:]\n]*::" contains=hsFunction,hsReservedOp
+syn match hsFunctionList "^\s*\(\<\(where\>\|let\>\)\@![a-z][a-zA-Z0-9']*[[:space:]\n,]\+\)*[a-z][a-zA-Z0-9']*[[:space:]\n]*\ze::" contains=hsFunction,hsReservedOp
 syn match hsFunction "\s*[a-z][a-zA-Z0-9']*\([[:space:]\n]*\(::\|,\)\)\@=" contained
 " Also support the style where the first where binding is on the same line as
 " the where keyword.
 syn match hsFunction "\(\<\(where\|let\)\s\+\([a-z][a-zA-Z0-9']*\s*,\s*\)*\)\@<=[a-z][a-zA-Z0-9']*\(\s*\(,\s*[a-z][a-zA-Z0-9']*\s*\)*::\)\@="
 
-syn region hsTypeAnno start="::" end="\(,\|)\|}\)" contains=@hsTypeSyntax keepend
+syn region _hsParenTypeSyntax start="(" end=")" matchgroup=hsDelimiter contains=_hsParenTypeSyntax,@hsTypeSyntax contained
+syn region hsTypeAnno start="::" end="\(,\|}\|)\|$\)" contains=_hsParenTypeSyntax,@hsTypeSyntax
 
 " FIXME Ignoring proc for now, also mdo and rec
 
