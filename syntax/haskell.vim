@@ -102,7 +102,7 @@ syn match hsOperator "\(\%^\#\!\)\@!\(\(\<[A-Z]\w*\)\@64<=\.\)\@!\(--\+\([^.%\~\
 " Include support for infix functions as operators
 syn match hsOperator "`[a-zA-Z0-9\.]\+`"
 " Operators that are language-defined -- '=', '::', '=>' etc
-syn match hsReservedOp "\%(=\(\s\|\w\|$\)\|::\|=>\|->\|<-\)"
+syn match hsReservedOp "\%(=\(\s\|\w\|$\)\|::\|=>\|->\|<-\|\s|\s\)"
 
 " Highlight function/value names in type signatures.  Looks ahead to find a ::
 " after a name.  This allows whitespace before the name so that it can match
