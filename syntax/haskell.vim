@@ -30,10 +30,10 @@ syn match  hsFloat            "\<[0-9]\+\.[0-9]\+\([eE][-+]\=[0-9]\+\)\=\>"
 " a capital letter.  Note that this also handles the case of @M.lookup@ where
 " M is a qualified import.  There is a big negative lookbehind assertion here
 " so that we don't highlight import and module statements oddly.
-syn match hsTypeName "\(^import\s.*\|^module\s.*\)\@<!\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*"
+syn match hsDataCons "\(^import\s.*\|^module\s.*\)\@<!\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*"
 " Also make unit and the empty list easy to spot - they are constructors too.
-syn match hsTypeName "()"
-syn match hsTypeName "\[\]"
+syn match hsDataCons "()"
+syn match hsDataCons "\[\]"
 
 " These are keywords that are only highlighted if they are in comments.
 syn keyword hsFIXME contained FIXME TODO XXX BUG NOTE
@@ -79,14 +79,15 @@ syn keyword hsImport import module
 " Treat 'qualified', 'as', and 'hiding' as keywords when following 'import'
 syn match hsImport '\(\<import\>.*\)\@<=\<\(qualified\|as\|hiding\)\>'
 
-syn cluster hsTypeSyntax contains=hsTypeDecls,hsTypeVar,hsKeyword,hsReservedOp,hsTypeName,hsDelimiter
+" For `data [hsTypeSyntax] = ...` and `foo :: [hsTypeSyntax]`
+syn cluster hsTypeSyntax contains=hsTypeDecls,hsTypeVar,hsKeyword,hsReservedOp,hsTypeCons,hsDelimiter
 
 syn keyword hsTypeDecls deriving default
-
-" Declare the remaining hsTypeDecls as contained because keywords have higher
-" matching priority than regions
 syn region hsTypeDecl start="\(class\|instance\|data\|newtype\|type\)" end="\(where\|=\)\_s" contains=@hsTypeSyntax transparent keepend
 syn match hsTypeVar "\<[a-z]\([a-z0-9]\|'\)*" contained
+syn match hsTypeCons "\(^\|[^a-zA-Z0-9]\)\@<=[A-Z][a-zA-Z0-9_]*" contained
+" Declare the remaining hsTypeDecls as contained because keywords have higher
+" matching priority than regions
 syn keyword hsTypeDecls class instance data newtype type contained
 
 " FIXME: Maybe we can do something fancy for data/type families?  'family' is
@@ -165,6 +166,7 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsImport Include
   HiLink hsTypeDecls Keyword
   HiLink hsTypeVar Identifier
+  HiLink hsTypeCons StorageClass
 
   HiLink hsFIXME Todo
 
@@ -174,7 +176,7 @@ if version >= 508 || !exists('did_hs_syntax_inits')
   HiLink hsModuleQualifier StorageClass
 
   HiLink hsFunction Function
-  HiLink hsTypeName Type
+  HiLink hsDataCons Type
 
   " Literals
   HiLink hsSpecialChar SpecialChar
